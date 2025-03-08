@@ -126,14 +126,14 @@ const CaseUpload = () => {
                 Drop your files here or click to browse
               </p>
               
-              <Button 
-                as="label" 
-                htmlFor="file-upload" 
-                variant="outline"
-                className="cursor-pointer"
-              >
-                Select Files
-              </Button>
+              <label htmlFor="file-upload">
+                <Button 
+                  variant="outline"
+                  className="cursor-pointer"
+                >
+                  Select Files
+                </Button>
+              </label>
               
               <p className="text-xs text-muted-foreground mt-4">
                 Supports PDF, DOCX, TXT, RTF (max 50MB per file)
