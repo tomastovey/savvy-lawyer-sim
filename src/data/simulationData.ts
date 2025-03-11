@@ -1,4 +1,3 @@
-
 import { Check, Users, Scale, GavelSquare, MessageSquare, Brain } from "lucide-react";
 
 export interface SimulationScenario {
@@ -106,7 +105,7 @@ export const simulationScenarios: SimulationScenario[] = [
           {
             id: 'witness-intro',
             type: 'prompt',
-            content: 'Good morning. My name is Sarah Johnson. I've worked at the store for about 3 years as a sales associate.',
+            content: 'Good morning. My name is Sarah Johnson. I have worked at the store for about 3 years as a sales associate.',
             speaker: 'Witness',
             role: 'Store Employee'
           },
@@ -131,7 +130,7 @@ export const simulationScenarios: SimulationScenario[] = [
                 id: 'q1-3',
                 text: 'You didn\'t actually see what caused the plaintiff to fall, did you?',
                 value: 'neutral',
-                consequence: 'While this gets to an important point, it's too direct too early and could make the witness defensive.'
+                consequence: 'While this gets to an important point, it\'s too direct too early and could make the witness defensive.'
               }
             ]
           },
@@ -168,7 +167,7 @@ export const simulationScenarios: SimulationScenario[] = [
               },
               {
                 id: 'q2-3',
-                text: 'So you're admitting you weren't paying attention to safety hazards in your section?',
+                text: 'So you are admitting you were not paying attention to safety hazards in your section?',
                 value: 'bad',
                 consequence: 'This is overly aggressive and mischaracterizes what the witness said, which could damage your credibility.'
               }
@@ -469,7 +468,7 @@ export const simulationScenarios: SimulationScenario[] = [
                 id: 'juror-concern-3',
                 text: 'A juror who has expressed general distrust of large corporations',
                 value: 'neutral',
-                consequence: 'While this might be relevant in some corporate cases, it's not directly related to your client\'s embezzlement case or their defense of being framed.'
+                consequence: 'While this might be relevant in some corporate cases, it\'s not directly related to your client\'s embezzlement case or their defense of being framed.'
               }
             ]
           }
@@ -571,7 +570,7 @@ export const simulationScenarios: SimulationScenario[] = [
               },
               {
                 id: 'challenge-2',
-                text: 'The retired teacher who expressed being \"tough on crime\" but has no specific financial background',
+                text: 'The retired teacher who expressed being "tough on crime" but has no specific financial background',
                 value: 'neutral',
                 consequence: 'While this juror might have some general bias, they lack the specific expertise that would make them particularly damaging to your case.'
               },
@@ -584,7 +583,7 @@ export const simulationScenarios: SimulationScenario[] = [
             ]
           }
         ],
-        outcome: 'Your jury selection strategy has resulted in a panel that includes several members with personal experiences of workplace conflicts and misunderstandings. You've successfully removed jurors with strong financial compliance backgrounds who might have been skeptical of your defense theory.'
+        outcome: 'Your jury selection strategy has resulted in a panel that includes several members with personal experiences of workplace conflicts and misunderstandings. You\'ve successfully removed jurors with strong financial compliance backgrounds who might have been skeptical of your defense theory.'
       }
     ]
   }
