@@ -93,7 +93,6 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
     }
   }, [scenario, navigate, isAuthenticated]);
   
-  // Initialize simulation with first message
   useEffect(() => {
     if (scenario) {
       // Add welcome/context message
@@ -112,14 +111,12 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
     }
   }, [scenario]);
   
-  // Scroll to bottom of chat when new messages are added
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [chatMessages]);
   
-  // Calculate progress
   useEffect(() => {
     if (!scenario) return;
     
@@ -862,4 +859,90 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
       {/* Court Guidelines Dialog */}
       <Dialog open={showCourtGuidelines} onOpenChange={setShowCourtGuidelines}>
         <DialogContent className="max-w-md">
-          <Dialog
+          <DialogHeader>
+            <DialogTitle>Court Procedures & Guidelines</DialogTitle>
+            <DialogDescription>
+              Important protocols for this legal proceeding
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 text-sm">
+            <div>
+              <h4 className="font-medium mb-1">Courtroom Etiquette</h4>
+              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                <li>Always address the judge as "Your Honor"</li>
+                <li>Stand when addressing the court</li>
+                <li>Refer to opposing counsel as "Counsel"</li>
+                <li>Do not interrupt when others are speaking</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-medium mb-1">Objections</h4>
+              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                <li>Object promptly when rules of evidence are violated</li>
+                <li>State the legal basis for the objection</li>
+                <li>Wait for the judge's ruling before continuing</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-medium mb-1">Questioning Witnesses</h4>
+              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                <li>Use leading questions during cross-examination</li>
+                <li>Avoid argumentative or badgering techniques</li>
+                <li>Ask clear, concise questions</li>
+                <li>Do not ask for speculation or hearsay</li>
+              </ul>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* End Simulation Confirmation Dialog */}
+      <Dialog open={showEndConfirmDialog} onOpenChange={setShowEndConfirmDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>End Current Proceedings?</DialogTitle>
+            <DialogDescription>
+              You're about to conclude this case and receive feedback on your performance.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground mb-4">
+              The court will provide a comprehensive assessment of your legal strategy and performance.
+            </p>
+            
+            <div className="flex justify-end gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowEndConfirmDialog(false)}
+              >
+                Continue Case
+              </Button>
+              <Button 
+                onClick={() => {
+                  setShowEndConfirmDialog(false);
+                  setShowResults(true);
+                }}
+              >
+                View Assessment
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)}
+        defaultTab="signin"
+      />
+    </div>
+  );
+};
+
+export default SimulationEngine;
+
