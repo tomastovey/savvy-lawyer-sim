@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,6 @@ import {
   User,
   Info,
   AlertCircle,
-  // Add the missing icon imports
   UserCircle as Users,
   BadgePercent as Gavel,
   ClipboardList
@@ -82,15 +82,31 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
   
   const [showEndConfirmDialog, setShowEndConfirmDialog] = useState(false);
   
+  // Courtroom ambiance effects
+  const [showAmbiance, setShowAmbiance] = useState(false);
+  const [ambianceMessage, setAmbianceMessage] = useState('');
+  
   useEffect(() => {
     if (!scenario) {
       navigate('/simulation');
       toast.error('Simulation not found');
+      return;
     }
     
     if (!isAuthenticated) {
       setAuthModalOpen(true);
     }
+    
+    // Add initial courtroom ambiance
+    setTimeout(() => {
+      setShowAmbiance(true);
+      setAmbianceMessage("The courtroom falls silent as proceedings begin. A gentle shuffle of papers can be heard as the attorneys prepare their materials.");
+      
+      setTimeout(() => {
+        setShowAmbiance(false);
+      }, 5000);
+    }, 1000);
+    
   }, [scenario, navigate, isAuthenticated]);
   
   useEffect(() => {
@@ -183,6 +199,18 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, consequenceMessage]);
+      }, 800);
+    } else {
+      // Neutral response
+      setTimeout(() => {
+        const neutralFeedback: ChatMessage = {
+          sender: 'ai',
+          senderName: 'Courtroom Observer',
+          senderRole: 'Body Language',
+          content: 'The jury\'s expressions remain neutral, carefully evaluating your statement.',
+          timestamp: new Date()
+        };
+        setChatMessages(prev => [...prev, neutralFeedback]);
       }, 800);
     }
     
@@ -351,12 +379,17 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
     
     // Courtroom reaction to user input
     setTimeout(() => {
-      // Random courtroom ambiance reactions for realism
+      // Enhanced realistic courtroom ambiance reactions
       const reactions = [
         "The gallery remains silent as your words echo in the courtroom.",
         "The court reporter's fingers move quickly across the stenotype machine.",
         "The opposing counsel scribbles notes as you finish speaking.",
-        "The judge maintains a neutral expression, carefully considering your statement."
+        "The judge maintains a neutral expression, carefully considering your statement.",
+        "The jury forewoman adjusts her glasses, paying close attention to your argument.",
+        "A slight murmur ripples through the gallery, quickly silenced by the bailiff.",
+        "The witness shifts uncomfortably in the stand as you make your point.",
+        "The clerk examines a document, occasionally glancing up at your presentation.",
+        "The bailiff maintains a stoic expression, standing alert by the judge's bench."
       ];
       
       const ambianceMessage: ChatMessage = {
@@ -385,7 +418,7 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
   const handleAIHelp = () => {
     setShowAIHelper(true);
     
-    // Generate contextual advice based on current stage
+    // Generate more specific contextual advice based on current stage
     let helpMessage = "";
     
     if (currentStage && currentInteraction) {
@@ -605,6 +638,13 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
   
   return (
     <div className="max-w-4xl mx-auto relative">
+      {/* Courtroom ambiance notification */}
+      {showAmbiance && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 bg-slate-800/90 text-white px-4 py-3 rounded-lg shadow-lg max-w-md text-center text-sm animate-fade-in">
+          <p className="italic">{ambianceMessage}</p>
+        </div>
+      )}
+      
       {/* Simulation header */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
@@ -945,4 +985,3 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
 };
 
 export default SimulationEngine;
-
