@@ -1,12 +1,36 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Upload, FileText, Check, X } from 'lucide-react';
+import { Upload, FileText, Check, X, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+import AuthModal from './auth/AuthModal';
 
-const FileItem = ({ name, size, status }: { name: string, size: string, status: 'uploading' | 'complete' | 'error' }) => {
+interface FileData {
+  id: string;
+  name: string;
+  size: string;
+  status: 'uploading' | 'complete' | 'error';
+  progress: number;
+  file: File;
+}
+
+const FileItem = ({ 
+  name, 
+  size, 
+  status, 
+  progress, 
+  onRemove 
+}: { 
+  name: string; 
+  size: string; 
+  status: 'uploading' | 'complete' | 'error'; 
+  progress: number;
+  onRemove?: () => void;
+}) => {
   return (
-    <div className="flex items-center justify-between p-3 border border-border rounded-lg mb-2 bg-white">
+    <div className="flex items-center justify-between p-3 border border-border rounded-lg mb-2 bg-white group">
       <div className="flex items-center space-x-3">
         <div className="text-primary">
           <FileText size={20} />
@@ -14,21 +38,44 @@ const FileItem = ({ name, size, status }: { name: string, size: string, status: 
         <div>
           <p className="text-sm font-medium">{name}</p>
           <p className="text-xs text-muted-foreground">{size}</p>
+          
+          {status === 'uploading' && (
+            <div className="w-full mt-1">
+              <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary transition-all duration-300 ease-out" 
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      <div>
+      <div className="flex items-center space-x-2">
         {status === 'uploading' && (
-          <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+          <div className="text-muted-foreground text-xs mr-2">{progress}%</div>
         )}
+        
         {status === 'complete' && (
           <div className="text-green-600">
             <Check size={18} />
           </div>
         )}
+        
         {status === 'error' && (
           <div className="text-red-600">
-            <X size={18} />
+            <AlertCircle size={18} />
           </div>
+        )}
+        
+        {onRemove && (
+          <button 
+            onClick={onRemove}
+            className="text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+            aria-label="Remove file"
+          >
+            <X size={18} />
+          </button>
         )}
       </div>
     </div>
@@ -37,7 +84,11 @@ const FileItem = ({ name, size, status }: { name: string, size: string, status: 
 
 const CaseUpload = () => {
   const [dragActive, setDragActive] = useState(false);
-  const [files, setFiles] = useState<{ name: string, size: string, status: 'uploading' | 'complete' | 'error' }[]>([]);
+  const [files, setFiles] = useState<FileData[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isAuthenticated } = useAuth();
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -55,35 +106,121 @@ const CaseUpload = () => {
     setDragActive(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      if (!isAuthenticated) {
+        setAuthModalOpen(true);
+        return;
+      }
+      
       handleFiles(e.dataTransfer.files);
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      if (!isAuthenticated) {
+        setAuthModalOpen(true);
+        return;
+      }
+      
       handleFiles(e.target.files);
     }
   };
 
   const handleFiles = (fileList: FileList) => {
-    const newFiles = Array.from(fileList).map(file => ({
-      name: file.name,
-      size: formatFileSize(file.size),
-      status: 'uploading' as const
-    }));
+    const newFiles = Array.from(fileList).map(file => {
+      // Check file type
+      const fileType = file.type;
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'text/plain',
+        'application/rtf'
+      ];
+      
+      if (!allowedTypes.includes(fileType)) {
+        toast.error(`File type not supported: ${file.name}`);
+        return null;
+      }
+      
+      // Check file size (max 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        toast.error(`File too large: ${file.name} (max 50MB)`);
+        return null;
+      }
+      
+      return {
+        id: Math.random().toString(36).substr(2, 9),
+        name: file.name,
+        size: formatFileSize(file.size),
+        status: 'uploading' as const,
+        progress: 0,
+        file
+      };
+    }).filter(Boolean) as FileData[];
     
-    setFiles([...files, ...newFiles]);
+    if (newFiles.length === 0) return;
     
-    // Simulate file upload completion
+    setFiles(prev => [...prev, ...newFiles]);
+    setIsUploading(true);
+    
+    // Simulate file upload progress
+    newFiles.forEach(file => {
+      const upload = setInterval(() => {
+        setFiles(prev => 
+          prev.map(f => 
+            f.id === file.id
+              ? { 
+                  ...f, 
+                  progress: Math.min(f.progress + Math.floor(Math.random() * 10), 100),
+                  status: f.progress + 10 >= 100 ? 'complete' as const : 'uploading' as const
+                }
+              : f
+          )
+        );
+        
+        // Check if all files are uploaded
+        let allComplete = true;
+        setFiles(prev => {
+          allComplete = prev.every(f => f.status === 'complete');
+          return prev;
+        });
+        
+        if (allComplete) {
+          setIsUploading(false);
+          clearInterval(upload);
+          toast.success("All files uploaded successfully!");
+        }
+      }, 300);
+    });
+  };
+
+  const removeFile = (id: string) => {
+    setFiles(prev => prev.filter(file => file.id !== id));
+  };
+  
+  const analyzeDocuments = () => {
+    if (!isAuthenticated) {
+      setAuthModalOpen(true);
+      return;
+    }
+    
+    if (files.length === 0) {
+      toast.error("Please upload at least one document to analyze");
+      return;
+    }
+    
+    if (files.some(f => f.status === 'uploading')) {
+      toast.error("Please wait for all files to finish uploading");
+      return;
+    }
+    
+    toast.success("Analysis started! You'll be notified when it's complete.");
+    
+    // Simulate analysis process
     setTimeout(() => {
-      setFiles(prev => 
-        prev.map((file, i) => 
-          i >= prev.length - newFiles.length
-            ? { ...file, status: 'complete' as const }
-            : file
-        )
-      );
-    }, 2000);
+      toast.success("Document analysis complete!");
+    }, 3000);
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -111,10 +248,12 @@ const CaseUpload = () => {
             >
               <input
                 id="file-upload"
+                ref={fileInputRef}
                 type="file"
                 multiple
                 className="hidden"
                 onChange={handleFileChange}
+                accept=".pdf,.doc,.docx,.txt,.rtf"
               />
               
               <div className="mb-6 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
@@ -130,6 +269,7 @@ const CaseUpload = () => {
                 <Button 
                   variant="outline"
                   className="cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
                 >
                   Select Files
                 </Button>
@@ -144,13 +284,24 @@ const CaseUpload = () => {
               <div className="mt-6 animate-fade-in">
                 <h4 className="text-sm font-medium mb-3">Uploaded Files ({files.length})</h4>
                 <div className="max-h-[250px] overflow-y-auto pr-2">
-                  {files.map((file, index) => (
-                    <FileItem key={index} {...file} />
+                  {files.map((file) => (
+                    <FileItem 
+                      key={file.id} 
+                      name={file.name} 
+                      size={file.size} 
+                      status={file.status} 
+                      progress={file.progress}
+                      onRemove={() => removeFile(file.id)}
+                    />
                   ))}
                 </div>
                 {files.some(f => f.status === 'complete') && (
-                  <Button className="mt-4 w-full">
-                    Analyze Documents
+                  <Button 
+                    className="mt-4 w-full"
+                    onClick={analyzeDocuments}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? 'Uploading...' : 'Analyze Documents'}
                   </Button>
                 )}
               </div>
@@ -210,6 +361,13 @@ const CaseUpload = () => {
           </div>
         </div>
       </div>
+      
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)}
+        defaultTab="signin"
+      />
     </section>
   );
 };
