@@ -310,7 +310,7 @@ export const simulationScenarios: SimulationScenario[] = [
               },
               {
                 id: 'structure-3',
-3 text: 'Focus primarily on technical financial details to demonstrate expertise',
+                text: 'Focus primarily on technical financial details to demonstrate expertise',
                 value: 'bad',
                 consequence: 'This approach risks losing jurors who may not understand complex financial concepts.'
               }
@@ -588,4 +588,3 @@ export const simulationScenarios: SimulationScenario[] = [
     ]
   }
 ];
-
