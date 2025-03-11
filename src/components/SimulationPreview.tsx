@@ -4,39 +4,24 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, ChevronRight, Play, X, Info } from 'lucide-react';
 import { toast } from 'sonner';
-
-// Simulation scenarios
-const scenarios = [
-  {
-    id: 'cross-examination',
-    title: 'Cross-Examination',
-    description: 'Practice challenging witness testimony with AI-powered responses',
-    difficulty: 'Medium',
-    duration: '30 min',
-    participants: '2-3'
-  },
-  {
-    id: 'opening-statement',
-    title: 'Opening Statement',
-    description: 'Rehearse your opening statement with real-time feedback on delivery and content',
-    difficulty: 'Easy',
-    duration: '15 min',
-    participants: '1'
-  },
-  {
-    id: 'jury-selection',
-    title: 'Jury Selection',
-    description: 'Develop skills in identifying favorable jurors and eliminating biased candidates',
-    difficulty: 'Hard',
-    duration: '45 min',
-    participants: '5+'
-  }
-];
+import { useNavigate } from 'react-router-dom';
+import { simulationScenarios } from '@/data/simulationData';
 
 const SimulationPreview = () => {
+  const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeScenario, setActiveScenario] = useState<string | null>(null);
   const [showScenarios, setShowScenarios] = useState(false);
+
+  // Use the actual scenarios from the data file
+  const scenarios = simulationScenarios.map(s => ({
+    id: s.id,
+    title: s.title,
+    description: s.description,
+    difficulty: s.difficulty,
+    duration: s.duration,
+    participants: s.participants
+  }));
 
   const handlePlayClick = () => {
     setIsPlaying(true);
@@ -44,12 +29,11 @@ const SimulationPreview = () => {
     setTimeout(() => {
       setIsPlaying(false);
       setShowScenarios(true);
-    }, 3000);
+    }, 2000);
   };
 
   const handleScenarioSelect = (scenarioId: string) => {
     setActiveScenario(scenarioId);
-    toast.success("Scenario selected! In a full implementation, this would launch the simulation.");
   };
 
   const handleStartSimulation = () => {
@@ -58,8 +42,7 @@ const SimulationPreview = () => {
       return;
     }
     
-    toast.success(`Starting ${scenarios.find(s => s.id === activeScenario)?.title} simulation`);
-    // This would launch the full simulation in a production environment
+    navigate(`/simulation/${activeScenario}`);
   };
 
   const resetView = () => {
@@ -90,7 +73,7 @@ const SimulationPreview = () => {
             )}>
               {/* Courtroom simulation preview image */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGNvdXJ0cm9vbXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=1200&q=80')] bg-center bg-cover opacity-70"></div>
+              <div className="absolute inset-0 bg-[url('/lovable-uploads/b6602eda-6991-4f2d-9c84-f72e920bb08b.png')] bg-center bg-cover opacity-70"></div>
               
               {/* Play button */}
               {!isPlaying && (
@@ -105,7 +88,7 @@ const SimulationPreview = () => {
                 </button>
               )}
               
-              {/* Video content (would be replaced with actual video in production) */}
+              {/* Loading animation (would be replaced with actual video in production) */}
               {isPlaying && (
                 <div className="absolute inset-0 flex items-center justify-center z-20 bg-black">
                   <div className="text-center">
@@ -125,7 +108,7 @@ const SimulationPreview = () => {
             
             {/* Feature badge */}
             <div className="absolute top-4 left-4 z-20 bg-primary/90 text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
-              Premium Feature
+              Interactive Simulations
             </div>
           </div>
         ) : (
@@ -180,8 +163,8 @@ const SimulationPreview = () => {
                   <Info size={20} />
                 </div>
                 <div>
-                  <h4 className="font-medium">Simulation Options</h4>
-                  <p className="text-sm text-muted-foreground">Configure your practice environment and difficulty settings before starting</p>
+                  <h4 className="font-medium">Chat with AI Assistant</h4>
+                  <p className="text-sm text-muted-foreground">During the simulation, you can ask the AI for advice and guidance on your approach</p>
                 </div>
               </div>
               <Button 
@@ -222,10 +205,10 @@ const SimulationPreview = () => {
           <div className="glass-panel rounded-xl p-6">
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-primary" />
-              Performance Feedback
+              AI Assistant Chat
             </h3>
             <p className="text-muted-foreground">
-              Receive detailed analysis and recommendations to improve your courtroom presence and strategy.
+              Get real-time guidance and advice from our AI legal assistant during your simulation practice.
             </p>
           </div>
         </div>

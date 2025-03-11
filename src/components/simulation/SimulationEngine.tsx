@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, ChevronRight, Award, XCircle, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ChevronLeft, ChevronRight, Award, XCircle, CheckCircle, AlertTriangle, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { simulationScenarios, SimulationStage, SimulationInteraction, SimulationOption } from '@/data/simulationData';
@@ -14,6 +15,12 @@ interface UserChoice {
   interactionId: string;
   optionId: string;
   value: 'good' | 'neutral' | 'bad';
+}
+
+interface ChatMessage {
+  sender: 'user' | 'ai';
+  content: string;
+  timestamp: Date;
 }
 
 const SimulationEngine = () => {
@@ -30,6 +37,12 @@ const SimulationEngine = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   
+  // Chat functionality
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [userMessage, setUserMessage] = useState('');
+  const [showChat, setShowChat] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     if (!scenario) {
       navigate('/simulation');
@@ -40,6 +53,13 @@ const SimulationEngine = () => {
       setAuthModalOpen(true);
     }
   }, [scenario, navigate, isAuthenticated]);
+  
+  // Scroll to bottom of chat when new messages are added
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages]);
   
   // Calculate progress
   useEffect(() => {
@@ -136,6 +156,71 @@ const SimulationEngine = () => {
   
   const handleCompleteSimulation = () => {
     setShowResults(true);
+  };
+  
+  // Chat functionality
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!userMessage.trim()) return;
+    
+    // Add user message to chat
+    const newUserMessage: ChatMessage = {
+      sender: 'user',
+      content: userMessage,
+      timestamp: new Date()
+    };
+    
+    setChatMessages(prev => [...prev, newUserMessage]);
+    setUserMessage('');
+    
+    // Generate AI response
+    setTimeout(() => {
+      let aiResponse = "";
+      
+      if (currentStage && currentInteraction) {
+        // Generate contextual response based on current simulation stage
+        if (userMessage.toLowerCase().includes('help')) {
+          aiResponse = `To proceed in this ${scenario?.title} simulation, consider the current context: ${currentStage.description}. What would be most effective in this situation?`;
+        } else if (userMessage.toLowerCase().includes('evidence') || userMessage.toLowerCase().includes('document')) {
+          aiResponse = `In this stage, focus on ${currentStage.title}. The key is to understand how to effectively ${currentInteraction.type === 'choice' ? 'make choices that' : 'proceed in a way that'} will strengthen your case.`;
+        } else if (userMessage.toLowerCase().includes('strategy') || userMessage.toLowerCase().includes('approach')) {
+          aiResponse = `For the ${scenario?.title} simulation, a strong strategy involves careful consideration of each interaction. Think about the long-term impact of your decisions on your case outcome.`;
+        } else {
+          // Default responses based on current interaction
+          const responses = [
+            `Remember that in ${currentStage.title}, your goal is to ${scenario?.objectives[0]}.`,
+            `Consider how your actions will be perceived by others in the courtroom.`,
+            `Think about the implications of your choices on your overall case strategy.`,
+            `What would be most effective given the current context: ${currentInteraction.content}?`
+          ];
+          aiResponse = responses[Math.floor(Math.random() * responses.length)];
+        }
+      } else {
+        aiResponse = "I'm here to help with your legal simulation. What specific aspect would you like guidance on?";
+      }
+      
+      const newAiMessage: ChatMessage = {
+        sender: 'ai',
+        content: aiResponse,
+        timestamp: new Date()
+      };
+      
+      setChatMessages(prev => [...prev, newAiMessage]);
+    }, 1000);
+  };
+  
+  const toggleChat = () => {
+    setShowChat(!showChat);
+    if (!showChat && chatMessages.length === 0) {
+      // Add initial AI message when opening chat for the first time
+      const initialMessage: ChatMessage = {
+        sender: 'ai',
+        content: `Welcome to the ${scenario?.title} simulation! I'm your AI assistant. How can I help you with this exercise?`,
+        timestamp: new Date()
+      };
+      setChatMessages([initialMessage]);
+    }
   };
   
   if (!scenario) return null;
@@ -257,6 +342,7 @@ const SimulationEngine = () => {
               setUserChoices([]);
               setIsComplete(false);
               setShowResults(false);
+              setChatMessages([]);
             }}
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
@@ -273,7 +359,7 @@ const SimulationEngine = () => {
   }
   
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto relative">
       {/* Simulation header */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
@@ -379,9 +465,16 @@ const SimulationEngine = () => {
       
       {/* Navigation buttons */}
       <div className={cn(
-        "flex justify-end",
+        "flex justify-between",
         currentInteraction?.type === 'choice' ? "opacity-50" : ""
       )}>
+        <Button
+          variant="outline"
+          onClick={toggleChat}
+        >
+          {showChat ? "Hide AI Assistant" : "Ask AI Assistant"}
+        </Button>
+        
         <Button
           disabled={currentInteraction?.type === 'choice'}
           onClick={isComplete ? handleCompleteSimulation : handleNext}
@@ -390,6 +483,47 @@ const SimulationEngine = () => {
           {isComplete ? null : <ChevronRight className="ml-2 h-4 w-4" />}
         </Button>
       </div>
+      
+      {/* Chat interface */}
+      {showChat && (
+        <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-white rounded-lg shadow-xl border border-gray-200 flex flex-col z-50">
+          <div className="p-3 bg-primary text-white rounded-t-lg flex justify-between items-center">
+            <h3 className="font-medium">AI Legal Assistant</h3>
+            <button onClick={toggleChat} className="text-white hover:text-gray-200">
+              <XCircle size={18} />
+            </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {chatMessages.map((msg, idx) => (
+              <div key={idx} className={cn(
+                "max-w-[80%] p-3 rounded-lg",
+                msg.sender === 'user' 
+                  ? "bg-primary/10 ml-auto rounded-tr-none" 
+                  : "bg-gray-100 mr-auto rounded-tl-none"
+              )}>
+                <p className="text-sm">{msg.content}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {msg.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                </p>
+              </div>
+            ))}
+            <div ref={chatEndRef} />
+          </div>
+          
+          <form onSubmit={handleSendMessage} className="p-3 border-t border-gray-200 flex gap-2">
+            <Input
+              value={userMessage}
+              onChange={(e) => setUserMessage(e.target.value)}
+              placeholder="Type your question..."
+              className="flex-1"
+            />
+            <Button type="submit" size="icon">
+              <Send size={18} />
+            </Button>
+          </form>
+        </div>
+      )}
       
       {/* Auth Modal */}
       <AuthModal 
