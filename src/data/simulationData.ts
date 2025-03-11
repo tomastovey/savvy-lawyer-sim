@@ -167,7 +167,7 @@ export const simulationScenarios: SimulationScenario[] = [
               },
               {
                 id: 'q2-3',
-                text: 'So you are admitting you were not paying attention to safety hazards in your section?',
+3                text: 'So you are admitting you were not paying attention to safety hazards in your section?',
                 value: 'bad',
                 consequence: 'This is overly aggressive and mischaracterizes what the witness said, which could damage your credibility.'
               }

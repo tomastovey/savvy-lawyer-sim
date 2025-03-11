@@ -73,7 +73,7 @@ const SimulationPreview = () => {
             )}>
               {/* Courtroom simulation preview image */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
-              <div className="absolute inset-0 bg-[url('/lovable-uploads/b6602eda-6991-4f2d-9c84-f72e920bb08b.png')] bg-center bg-cover opacity-70"></div>
+              <div className="absolute inset-0 bg-[url('/lovable-uploads/6584220c-b7b4-45f9-abae-8a3de28904c8.png')] bg-center bg-cover opacity-70"></div>
               
               {/* Play button */}
               {!isPlaying && (

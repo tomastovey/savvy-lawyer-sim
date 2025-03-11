@@ -13,7 +13,7 @@ const SimulationPage = () => {
       
       <div className="py-12 px-6">
         {id ? (
-          <SimulationEngine />
+          <SimulationEngine id={id} />
         ) : (
           <SimulationPreview />
         )}

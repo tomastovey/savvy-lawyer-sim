@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
@@ -23,8 +23,11 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-const SimulationEngine = () => {
-  const { id } = useParams<{ id: string }>();
+interface SimulationEngineProps {
+  id: string;
+}
+
+const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
@@ -407,7 +410,7 @@ const SimulationEngine = () => {
       <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
         {currentInteraction?.type === 'prompt' && (
           <div className="mb-4">
-            {currentInteraction.speaker && currentInteraction.role && (
+            {currentInteraction.speaker && (
               <div className="mb-2">
                 <span className="font-semibold">{currentInteraction.speaker}</span>
                 {currentInteraction.role && (
