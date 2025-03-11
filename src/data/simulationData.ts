@@ -1,4 +1,3 @@
-
 import { Check, Users, Scale, Gavel, MessageSquare, Brain } from "lucide-react";
 
 export interface SimulationScenario {
@@ -68,7 +67,21 @@ export const simulationScenarios: SimulationScenario[] = [
           {
             id: 'intro-1',
             type: 'prompt',
-            content: 'The witness has stated that they saw the plaintiff fall, but they were busy helping another customer and didn\'t see what caused the fall. They also mentioned that floor warning signs are "usually" put up after mopping.',
+            content: 'Court Clerk: "All rise. Department One of the Superior Court is now in session, the Honorable Judge Robertson presiding."',
+            speaker: 'Court Clerk',
+            role: 'Court Officer'
+          },
+          {
+            id: 'intro-2',
+            type: 'prompt',
+            content: 'Judge Robertson: "Be seated. We\'re here in the matter of Garcia v. Eastside Market. Counsel, are you ready to proceed with cross-examination of the witness?"',
+            speaker: 'Judge Robertson',
+            role: 'Judge'
+          },
+          {
+            id: 'intro-3',
+            type: 'prompt',
+            content: 'The witness has stated in direct examination that they saw the plaintiff fall, but they were busy helping another customer and didn\'t see what caused the fall. They also mentioned that floor warning signs are "usually" put up after mopping. Review these details carefully as you prepare your cross-examination.',
             speaker: 'System',
             role: 'Instructor'
           },
@@ -81,13 +94,13 @@ export const simulationScenarios: SimulationScenario[] = [
                 id: 'approach-1',
                 text: 'Be aggressive and immediately challenge the witness\'s credibility',
                 value: 'bad',
-                consequence: 'Starting with an aggressive approach may alienate the jury and make the witness defensive or uncooperative.'
+                consequence: 'Your Honor, objection! Defense counsel is badgering the witness with an unnecessarily hostile tone.'
               },
               {
                 id: 'approach-2',
                 text: 'Begin with friendly, factual questions to establish a foundation before challenging inconsistencies',
                 value: 'good',
-                consequence: 'This approach helps build rapport and creates a foundation of agreed facts before challenging any inconsistencies.'
+                consequence: 'This professional approach helps build rapport with the witness and jury while creating a foundation of agreed facts before challenging any inconsistencies.'
               },
               {
                 id: 'approach-3',
@@ -107,9 +120,16 @@ export const simulationScenarios: SimulationScenario[] = [
           {
             id: 'witness-intro',
             type: 'prompt',
-            content: 'Good morning. My name is Sarah Johnson. I have worked at the store for about 3 years as a sales associate.',
+            content: 'Good morning, Counsel. As I stated earlier, my name is Sarah Johnson. I have worked at Eastside Market for approximately three years as a sales associate.',
             speaker: 'Witness',
             role: 'Store Employee'
+          },
+          {
+            id: 'judge-reminder',
+            type: 'prompt',
+            content: 'Counsel, you may proceed with your cross-examination.',
+            speaker: 'Judge Robertson',
+            role: 'Judge'
           },
           {
             id: 'q1-choice',
@@ -124,22 +144,22 @@ export const simulationScenarios: SimulationScenario[] = [
               },
               {
                 id: 'q1-2',
-                text: 'Can you tell us everything you remember about the day of the incident?',
+                text: 'Can you tell the court everything you remember about the day of the incident?',
                 value: 'bad',
-                consequence: 'This open-ended question gives the witness too much freedom to potentially harm your case.'
+                consequence: 'Opposing Counsel: "Objection, Your Honor. Calls for a narrative response." Judge: "Sustained. Counsel, please ask specific questions."'
               },
               {
                 id: 'q1-3',
                 text: 'You didn\'t actually see what caused the plaintiff to fall, did you?',
                 value: 'neutral',
-                consequence: 'While this gets to an important point, it\'s too direct too early and could make the witness defensive.'
+                consequence: 'This gets to an important point, but it\'s too direct too early and could make the witness defensive.'
               }
             ]
           },
           {
             id: 'witness-response-1',
             type: 'prompt',
-            content: 'Yes, I was helping another customer at the time. I was showing them some products on the opposite side of the aisle.',
+            content: 'Yes, that\'s correct. I was assisting another customer with selecting products on the opposite side of the aisle, approximately 15 feet away from where the incident occurred.',
             speaker: 'Witness',
             role: 'Store Employee'
           }
@@ -159,26 +179,26 @@ export const simulationScenarios: SimulationScenario[] = [
                 id: 'q2-1',
                 text: 'And because you were helping this other customer, you didn\'t actually see what caused the plaintiff to fall, correct?',
                 value: 'good',
-                consequence: 'This effectively establishes a limitation in the witness\'s testimony.'
+                consequence: 'This effectively establishes a limitation in the witness\'s testimony without being combative.'
               },
               {
                 id: 'q2-2',
                 text: 'Would you say you were distracted at the time of the incident?',
                 value: 'neutral',
-                consequence: 'This question is somewhat leading and could allow the witness to disagree.'
+                consequence: 'Opposing Counsel: "Objection, calls for speculation." Judge: "Overruled. The witness may answer."'
               },
               {
                 id: 'q2-3',
                 text: 'So you are admitting you were not paying attention to safety hazards in your section?',
                 value: 'bad',
-                consequence: 'This is overly aggressive and mischaracterizes what the witness said, which could damage your credibility.'
+                consequence: 'Opposing Counsel: "Objection, Your Honor! Counsel is mischaracterizing the testimony." Judge: "Sustained. Watch your tone, Counselor."'
               }
             ]
           },
           {
             id: 'witness-response-2',
             type: 'prompt',
-            content: 'That\'s correct. I heard a noise and turned around to see the plaintiff on the floor, but I didn\'t see them actually fall or what caused it.',
+            content: 'That\'s correct. I heard a noise and turned around to see Mr. Garcia on the floor, but I didn\'t see him actually fall or what might have caused it.',
             speaker: 'Witness',
             role: 'Store Employee'
           },
@@ -189,15 +209,15 @@ export const simulationScenarios: SimulationScenario[] = [
             options: [
               {
                 id: 'q3-1',
-                text: 'You mentioned in your statement that warning signs are "usually" put up after mopping. Does that mean sometimes they aren\'t?',
+                text: 'Ms. Johnson, you mentioned in your earlier testimony that warning signs are "usually" put up after mopping. Does that mean sometimes they are not placed?',
                 value: 'good',
                 consequence: 'This effectively highlights a potential inconsistency in store safety procedures.'
               },
               {
                 id: 'q3-2',
-                text: 'Tell me about your store\'s cleaning procedures.',
+                text: 'Tell the court about your store\'s cleaning procedures.',
                 value: 'bad',
-                consequence: 'This open-ended question could allow the witness to provide rehearsed answers that strengthen the plaintiff\'s case.'
+                consequence: 'Opposing Counsel: "Objection, Your Honor. Vague and calls for a narrative." Judge: "Sustained. Please ask specific questions, Counselor."'
               },
               {
                 id: 'q3-3',
@@ -206,6 +226,20 @@ export const simulationScenarios: SimulationScenario[] = [
                 consequence: 'This is a relevant question but doesn\'t directly address the inconsistency in the witness\'s statement.'
               }
             ]
+          },
+          {
+            id: 'objection-1',
+            type: 'prompt',
+            content: 'Objection, Your Honor. Counsel is asking the witness to speculate about store procedures outside her responsibility.',
+            speaker: 'Opposing Counsel',
+            role: 'Plaintiff\'s Attorney'
+          },
+          {
+            id: 'judge-ruling-1',
+            type: 'prompt',
+            content: 'Overruled. The witness has already testified about these procedures. You may answer the question.',
+            speaker: 'Judge Robertson',
+            role: 'Judge'
           }
         ]
       },
@@ -217,7 +251,7 @@ export const simulationScenarios: SimulationScenario[] = [
           {
             id: 'witness-response-3',
             type: 'prompt',
-            content: 'Well... yes, I suppose there could be times when someone might forget to put them up right away. I can\'t say it happens often, but it\'s possible.',
+            content: 'Well... yes, I suppose there could be times when someone might forget to put them up right away. Our protocol is to always place them immediately, but I can\'t say with certainty that it happens 100% of the time.',
             speaker: 'Witness',
             role: 'Store Employee'
           },
@@ -228,15 +262,15 @@ export const simulationScenarios: SimulationScenario[] = [
             options: [
               {
                 id: 'q4-1',
-                text: 'And you have no personal knowledge of whether warning signs were put up on the day of the incident, correct?',
+                text: 'And you have no personal knowledge of whether warning signs were put up on the day of the incident in question, correct?',
                 value: 'good',
                 consequence: 'This effectively concludes by emphasizing the witness\'s lack of knowledge about a key fact.'
               },
               {
                 id: 'q4-2',
-                text: 'Would you agree that the store might have been negligent that day?',
+                text: 'Would you agree that the store was negligent in its safety protocols that day?',
                 value: 'bad',
-                consequence: 'This asks for a legal conclusion and allows the witness to defend the store.'
+                consequence: 'Opposing Counsel: "Objection! Calls for a legal conclusion and improper opinion testimony." Judge: "Sustained. The jury will disregard the question."'
               },
               {
                 id: 'q4-3',
@@ -249,19 +283,84 @@ export const simulationScenarios: SimulationScenario[] = [
           {
             id: 'witness-final',
             type: 'prompt',
-            content: 'That\'s correct. I don\'t know if they were put up that day or not.',
+            content: 'That\'s correct. I was not in that section prior to the incident, so I don\'t know if they were put up that day or not.',
             speaker: 'Witness',
             role: 'Store Employee'
           },
           {
             id: 'closing',
+            type: 'user-input',
+            content: 'You may now conclude your cross-examination with a final statement to the court.',
+            suggestedResponses: [
+              'No further questions, Your Honor. Thank you, Ms. Johnson.',
+              'Thank you for your candid testimony, Ms. Johnson. No further questions, Your Honor.',
+              'I have nothing further, Your Honor.'
+            ]
+          },
+          {
+            id: 'judge-response',
+            type: 'prompt',
+            content: 'Thank you, Counsel. Ms. Johnson, you may step down. Counsel for the plaintiff, do you wish to conduct redirect examination?',
+            speaker: 'Judge Robertson',
+            role: 'Judge'
+          },
+          {
+            id: 'opposing-counsel',
+            type: 'prompt',
+            content: 'Just briefly, Your Honor. Ms. Johnson, to your knowledge, has the store ever received complaints about improper floor maintenance before this incident?',
+            speaker: 'Opposing Counsel',
+            role: 'Plaintiff\'s Attorney'
+          },
+          {
+            id: 'objection-choice',
+            type: 'choice',
+            content: 'Do you want to object to this question?',
+            options: [
+              {
+                id: 'obj-1',
+                text: 'Objection, Your Honor. Calls for speculation and lacks foundation.',
+                value: 'good',
+                consequence: 'Judge: "Sustained. Counsel, please establish foundation for this line of questioning."'
+              },
+              {
+                id: 'obj-2',
+                text: 'No objection.',
+                value: 'bad',
+                consequence: 'The witness is allowed to potentially damage your case with hearsay testimony about prior incidents.'
+              },
+              {
+                id: 'obj-3',
+                text: 'Objection! Irrelevant and prejudicial!',
+                value: 'neutral',
+                consequence: 'Judge: "Overruled. The witness may answer as to her personal knowledge."'
+              }
+            ]
+          },
+          {
+            id: 'judge-final',
+            type: 'prompt',
+            content: 'Sustained. Counsel, move on to your next question or conclude your redirect.',
+            speaker: 'Judge Robertson',
+            role: 'Judge'
+          },
+          {
+            id: 'opposing-counsel-final',
             type: 'prompt',
             content: 'No further questions, Your Honor.',
-            speaker: 'You',
-            role: 'Defense Attorney'
+            speaker: 'Opposing Counsel',
+            role: 'Plaintiff\'s Attorney'
+          },
+          {
+            id: 'feedback',
+            type: 'feedback',
+            content: 'The court is now in recess. Let\'s review your performance in this cross-examination:',
+            feedback: {
+              positive: 'You effectively established key limitations in the witness\'s testimony, particularly regarding their inability to observe the cause of the fall and uncertainty about warning signs. Your professional demeanor maintained credibility with the court, and your timely objection prevented potentially damaging testimony.',
+              negative: 'There were instances where your questioning could have been more precise. Open-ended questions gave the witness too much control of the narrative at times. Remember that cross-examination is most effective when questions are leading and designed to elicit specific, short answers that support your case theory.'
+            }
           }
         ],
-        outcome: 'Your cross-examination successfully established that the witness did not see what caused the fall and cannot confirm whether warning signs were present. These points support your defense that there\'s insufficient evidence of your client\'s negligence.'
+        outcome: 'Your cross-examination successfully established that the witness did not see what caused the fall and cannot confirm whether warning signs were present. These points significantly weaken the plaintiff\'s case by creating reasonable doubt about your client\'s alleged negligence. The judge appeared receptive to your arguments, and the jury seemed to note the key inconsistencies you highlighted.'
       }
     ]
   },
