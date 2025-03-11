@@ -1,3 +1,4 @@
+
 import { Check, Users, Scale, Gavel, MessageSquare, Brain } from "lucide-react";
 
 export interface SimulationScenario {
