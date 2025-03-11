@@ -11,7 +11,7 @@ const SimulationPage = () => {
     <div className="min-h-screen bg-background">
       <div className="h-16 md:h-20"></div> {/* Spacer for navigation */}
       
-      <div className="py-12 px-6">
+      <div className="py-6 px-4 md:py-12 md:px-6">
         {id ? (
           <SimulationEngine id={id} />
         ) : (

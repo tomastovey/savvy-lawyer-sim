@@ -24,7 +24,7 @@ export interface SimulationStage {
 
 export interface SimulationInteraction {
   id: string;
-  type: 'prompt' | 'choice' | 'feedback';
+  type: 'prompt' | 'choice' | 'feedback' | 'user-input';
   content: string;
   speaker?: string;
   role?: string;
@@ -33,6 +33,7 @@ export interface SimulationInteraction {
     positive: string;
     negative: string;
   };
+  suggestedResponses?: string[];
 }
 
 export interface SimulationOption {
