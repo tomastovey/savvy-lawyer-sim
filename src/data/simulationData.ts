@@ -1,4 +1,4 @@
-import { Check, Users, Scale, GavelSquare, MessageSquare, Brain } from "lucide-react";
+import { Check, Users, Scale, Gavel, MessageSquare, Brain } from "lucide-react";
 
 export interface SimulationScenario {
   id: string;
@@ -270,7 +270,7 @@ export const simulationScenarios: SimulationScenario[] = [
     difficulty: 'Easy',
     duration: '15 min',
     participants: '1',
-    icon: GavelSquare,
+    icon: Gavel,
     objectives: [
       'Present a clear roadmap of your case',
       'Introduce key evidence and witnesses',
@@ -310,7 +310,7 @@ export const simulationScenarios: SimulationScenario[] = [
               },
               {
                 id: 'structure-3',
-                text: 'Focus primarily on technical financial details to demonstrate expertise',
+3 text: 'Focus primarily on technical financial details to demonstrate expertise',
                 value: 'bad',
                 consequence: 'This approach risks losing jurors who may not understand complex financial concepts.'
               }
@@ -588,3 +588,4 @@ export const simulationScenarios: SimulationScenario[] = [
     ]
   }
 ];
+
