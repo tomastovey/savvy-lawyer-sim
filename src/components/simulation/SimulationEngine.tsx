@@ -18,7 +18,10 @@ import {
   MessageSquare,
   User,
   Info,
-  AlertCircle
+  AlertCircle,
+  // Add the missing icon imports
+  UserCircle as Users,
+  BadgePercent as Gavel
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
