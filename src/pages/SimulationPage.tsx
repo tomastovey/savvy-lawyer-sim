@@ -15,7 +15,9 @@ const SimulationPage = () => {
         {id ? (
           <SimulationEngine id={id} />
         ) : (
-          <SimulationPreview />
+          <div className="max-w-5xl mx-auto">
+            <SimulationPreview />
+          </div>
         )}
       </div>
     </div>

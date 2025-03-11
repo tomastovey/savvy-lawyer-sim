@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,8 @@ import {
   AlertCircle,
   // Add the missing icon imports
   UserCircle as Users,
-  BadgePercent as Gavel
+  BadgePercent as Gavel,
+  ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -79,6 +79,8 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
   const [aiHelperMessage, setAiHelperMessage] = useState('');
   const [showCourtGuidelines, setShowCourtGuidelines] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  
+  const [showEndConfirmDialog, setShowEndConfirmDialog] = useState(false);
   
   useEffect(() => {
     if (!scenario) {
@@ -379,6 +381,10 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
     setShowResults(true);
   };
   
+  const handleEndSimulation = () => {
+    setShowEndConfirmDialog(true);
+  };
+  
   const handleAIHelp = () => {
     setShowAIHelper(true);
     
@@ -626,17 +632,28 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
             </Button>
           </div>
           
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => {
-              if (window.confirm('Are you sure you want to exit this case? Your progress will be lost.')) {
-                navigate('/simulation');
-              }
-            }}
-          >
-            <XCircle className="mr-1 h-4 w-4" /> Exit Case
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleEndSimulation}
+              className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 hover:text-amber-800"
+            >
+              <ClipboardList className="mr-1 h-4 w-4" /> End & Get Feedback
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                if (window.confirm('Are you sure you want to exit this case? Your progress will be lost.')) {
+                  navigate('/simulation');
+                }
+              }}
+            >
+              <XCircle className="mr-1 h-4 w-4" /> Exit Case
+            </Button>
+          </div>
         </div>
         
         <Progress value={progress} className="h-2 mb-2" />
@@ -845,54 +862,4 @@ const SimulationEngine: React.FC<SimulationEngineProps> = ({ id }) => {
       {/* Court Guidelines Dialog */}
       <Dialog open={showCourtGuidelines} onOpenChange={setShowCourtGuidelines}>
         <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Court Procedures & Guidelines</DialogTitle>
-            <DialogDescription>
-              Important protocols for this legal proceeding
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 text-sm">
-            <div>
-              <h4 className="font-medium mb-1">Courtroom Etiquette</h4>
-              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-                <li>Always address the judge as "Your Honor"</li>
-                <li>Stand when addressing the court</li>
-                <li>Refer to opposing counsel as "Counsel"</li>
-                <li>Do not interrupt when others are speaking</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium mb-1">Objections</h4>
-              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-                <li>Object promptly when rules of evidence are violated</li>
-                <li>State the legal basis for the objection</li>
-                <li>Wait for the judge's ruling before continuing</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium mb-1">Questioning Witnesses</h4>
-              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-                <li>Use leading questions during cross-examination</li>
-                <li>Avoid argumentative or badgering techniques</li>
-                <li>Ask clear, concise questions</li>
-                <li>Do not ask for speculation or hearsay</li>
-              </ul>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Auth Modal */}
-      <AuthModal 
-        isOpen={authModalOpen} 
-        onClose={() => setAuthModalOpen(false)}
-        defaultTab="signin"
-      />
-    </div>
-  );
-};
-
-export default SimulationEngine;
+          <Dialog
